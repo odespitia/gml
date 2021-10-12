@@ -24,9 +24,15 @@ Route::group([
 
 ], function ($router) {
 
-    Route::post('login', 'Admin/AuthController@login');
-    Route::post('logout', 'Admin/AuthController@logout');
-    Route::post('refresh', 'Admin/AuthController@refresh');
-    Route::post('me', 'Admin/AuthController@me');
+    Route::post('login', 'Admin\AuthController@login');
+    Route::post('logout', 'Admin\AuthController@logout');
+    Route::post('refresh', 'Admin\AuthController@refresh');
+    Route::post('me', 'Admin\AuthController@me');
+
+});
+
+Route::group(['middleware' => ['cors', 'api', 'jwt.auth']], function () { 
+    
+    Route::resource('profile/users', 'User\UserController');
 
 });
