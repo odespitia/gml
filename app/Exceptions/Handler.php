@@ -2,8 +2,15 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -32,7 +39,7 @@ class Handler extends ExceptionHandler
      * @param  \Throwable  $exception
      * @return void
      *
-     * @throws \Throwable
+     * @throws \Exception
      */
     public function report(Throwable $exception)
     {
@@ -50,6 +57,58 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof UnauthorizedHttpException) {
+
+            $preException = $exception->getPrevious();
+
+            if ($preException instanceof TokenExpiredException) {
+                return response()->json([
+                    'error' => 'TOKEN_EXPIRED',
+                    'msg' => 'El token ha expirado, actualícelo'
+                ], 401);
+            } else if ($preException instanceof TokenInvalidException) {
+
+                return response()->json([
+                    'error' => 'TOKEN_INVALID',
+                    'msg' => 'El token enviado es inválido'
+                ], 401);
+            } else if ($preException instanceof TokenBlacklistedException) {
+
+                return response()->json([
+                    'error' => 'TOKEN_BLACKLISTED',
+                    'msg' => 'Este token hace parte de la lista negra, actualícelo.'
+                ], 401);
+            }
+        }
+
+        if ($exception->getMessage() === 'Token not provided') {
+
+            return response()->json([
+                'error' => 'TOKEN_NOT_PROVIDED',
+                'msg' => 'Falta el token para acceder al recurso'
+            ], 401);
+        }
+        //Validation Form Request
+        if ($exception instanceof ValidationException) {
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Se generaron errores de validación',
+                    'data' => ['errors' => $exception->errors()]
+                ],
+                JsonResponse::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+
+        //Http Not Found
+        if ($exception instanceof NotFoundHttpException) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Ruta no encontrada... Por favor, verifique la ruta.',
+            ], 404);
+        }
+
         return parent::render($request, $exception);
     }
 }
