@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
@@ -57,6 +58,8 @@ class UserController extends Controller
             $profile->save();
 
             DB::commit();
+            // call our event here
+           UserRegistered::dispatch($profile);
 
             return response()->json([
                 'error' => false,
