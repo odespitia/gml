@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Prueba',
             'address' => 'Bogota',
             'movil' => '3102380000',
-            'country' => '0',
+            'country' => 'CO',
             'status_id' => 1,
             'category_id'=> 3
         ]);

@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->integer('movil')->unsigned();
             $table->string('address',180)->nullable();
             $table->string('email',150)->unique();
-            $table->unsignedTinyInteger('country');
+            $table->string('country',5);
             $table->unsignedTinyInteger('status_id');
             $table->unsignedTinyInteger('category_id');
             $table->timestamp('email_verified_at')->nullable();
