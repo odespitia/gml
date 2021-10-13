@@ -31,8 +31,16 @@ Route::group([
 
 });
 
-Route::group(['middleware' => ['cors', 'api', 'jwt.auth']], function () { 
+// Route::group(['middleware' => ['cors', 'api', 'jwt.auth']], function () { 
     
     Route::resource('profile/users', 'User\UserController');
 
-});
+    Route::resource('categories', 'Gestion\CategoryController')->only([
+        'index'
+    ]);
+
+    Route::resource('countries', 'Gestion\CountryController')->only([
+        'index'
+    ]);
+
+// });

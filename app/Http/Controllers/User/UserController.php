@@ -21,11 +21,19 @@ class UserController extends Controller
      */
     public function index()
     {
-        return response()->json([
-            'error' => true,
-            'code' => 406,
-            'msg' => 'aqui',
-        ], 406);
+        try {
+
+            $users = User::with(['category','status'])->get();
+            return response()->json([
+                'data' => $users,
+                'status' => 'OK',
+            ]);
+
+        } catch (Exception $th) {
+            return response()->json([
+                'error' => 'Error Interno, consulte con soporte tecnico.',
+            ], 406);
+        }
     }
 
     /**
